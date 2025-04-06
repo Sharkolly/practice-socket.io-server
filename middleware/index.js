@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
   // const token = req.header("x-auth-token");
-  const splitBearerToken = req.headers.authorization.split(" ")[1];
+  const splitBearerToken = req.headers.authorization;
   const token = splitBearerToken;
   if (!token) res.status(403).json({message: 'No token found. Please login again!'});
 
@@ -25,3 +25,4 @@ const verifyToken = (req, res, next) => {
 };
 
 module.exports = verifyToken;
+
