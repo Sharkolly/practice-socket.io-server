@@ -19,7 +19,7 @@ const app = express();
 const server = http.createServer(app); // 🔥 Create HTTP server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5174"],
+    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
     credentials: true,
   },
 });
@@ -28,12 +28,13 @@ const mongoDBUrl =
   "mongodb+srv://fola:fola@nodepractice.io7bvvx.mongodb.net/?retryWrites=true&w=majority&appName=nodepractice";
 
 app.use("/uploads", express.static("uploads"));
-app.use(
-  cors({
-    origin: ["http://localhost:5174"],
-    credentials: true,
-  })
-);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5174"],
+//     credentials: true,
+//   })
+// );
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -51,7 +52,6 @@ app.use("/api/auth/", router);
 let user;
 // 🔐 Protected Route
 app.get("/", verifyToken, async (req, res) => {
-  user = req.user;
   try {
     const userDetail = await User.findById(req.user._id).select("-password");
     res.json(userDetail);
@@ -122,10 +122,9 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
-
-app.get( '/check', (req,res) => {
-  res.json({status: true});
-})
+app.get("/check", (req, res) => {
+  res.json({ status: true });
+});
 mongoose
   .connect(mongoDBUrl, {
     useNewUrlParser: true,
@@ -171,10 +170,8 @@ io.on("connection", (socket) => {
 
       socket.join(data);
       cb("You Joined" + " " + data);
-      const getAllMsg = await Chat.findOne({ roomId: data })
-      io.to(data).emit("sent-message",  getAllMsg);
-
-
+      const getAllMsg = await Chat.findOne({ roomId: data });
+      io.to(data).emit("sent-message", getAllMsg);
 
       const checkIf = await Chat.find({ roomId: data });
       if (checkIf) {
@@ -205,9 +202,9 @@ io.on("connection", (socket) => {
         },
         { new: true, upsert: true }
       );
-      const getAllMsg = await Chat.findOne({ roomId: room })
+      const getAllMsg = await Chat.findOne({ roomId: room });
       console.log(getAllMsg);
-      io.to(room).emit("sent-message",  getAllMsg);
+      io.to(room).emit("sent-message", getAllMsg);
       // io.to(room).emit("sent-message", { message: data, id: socket.id });
     } else {
       // Send to everyone globally INCLUDING the sender
