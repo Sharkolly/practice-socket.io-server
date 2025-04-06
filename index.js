@@ -19,10 +19,16 @@ const app = express();
 const server = http.createServer(app); // 🔥 Create HTTP server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
+    origin: '*',
     credentials: true,
   },
 });
+// const io = new Server(server, {
+//   cors: {
+//     origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
+//     credentials: true,
+//   },
+// });
 
 const mongoDBUrl =
   "mongodb+srv://fola:fola@nodepractice.io7bvvx.mongodb.net/?retryWrites=true&w=majority&appName=nodepractice";
