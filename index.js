@@ -19,7 +19,7 @@ const app = express();
 const server = http.createServer(app); // 🔥 Create HTTP server
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5174'],
+    origin: ['http://localhost:5174',  "https://practice-socketio.vercel.app"],
     credentials: true,
   },
 });
@@ -37,7 +37,7 @@ app.use("/uploads", express.static("uploads"));
 // app.use(cors());
 app.use(
   cors({
-    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
+    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app"],
     credentials: true,
   })
 );
