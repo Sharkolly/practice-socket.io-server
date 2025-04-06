@@ -45,6 +45,7 @@ const transporter = nodemailer.createTransport({
 });
 
 app.use(cookieParser());
+app.options("*", cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser());
 app.use("/api/auth/", router);
