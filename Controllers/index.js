@@ -12,7 +12,7 @@ const signUp = async (req, res) => {
     const user = await saveUser.save();
     const userIdToString = await user._id.toString();
     const token = jwt.sign({ _id: userIdToString }, "mySecretKey", {
-      expiresIn: "1d",
+      expiresIn: "5d",
     });
     res.json({ token });
   } catch (err) {
@@ -50,7 +50,7 @@ const Login = async (req, res) => {
     if (!comparePassWord)
       res.status(401).json({ message: "Invalid Email or Password!" });
     const token = jwt.sign({ _id: checkForUser[0]._id }, "mySecretKey", {
-      expiresIn: "1d",
+      expiresIn: "5d",
     });
     res.json({ message: "Login Successful", token });
   } catch (err) {

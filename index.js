@@ -19,7 +19,8 @@ const app = express();
 const server = http.createServer(app); // 🔥 Create HTTP server
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: ['http://localhost:5174'],
+    credentials: true,
   },
 });
 // const io = new Server(server, {
@@ -33,13 +34,13 @@ const mongoDBUrl =
   "mongodb+srv://fola:fola@nodepractice.io7bvvx.mongodb.net/?retryWrites=true&w=majority&appName=nodepractice";
 
 app.use("/uploads", express.static("uploads"));
-app.use(cors());
-// app.use(
-//   cors({
-//     origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
-//     credentials: true,
-//   })
-// );
+// app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
+    credentials: true,
+  })
+);
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -50,7 +51,7 @@ const transporter = nodemailer.createTransport({
 });
 
 app.use(cookieParser());
-app.options("*", cors());
+// app.options("*", cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser());
 app.use("/api/auth/", router);
