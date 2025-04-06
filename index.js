@@ -28,13 +28,13 @@ const mongoDBUrl =
   "mongodb+srv://fola:fola@nodepractice.io7bvvx.mongodb.net/?retryWrites=true&w=majority&appName=nodepractice";
 
 app.use("/uploads", express.static("uploads"));
-// app.use(cors());
-app.use(
-  cors({
-    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
-    credentials: true,
-  })
-);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5174", "https://practice-socketio.vercel.app/"],
+//     credentials: true,
+//   })
+// );
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
