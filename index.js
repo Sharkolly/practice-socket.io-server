@@ -122,6 +122,10 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
+
+app.get( '/check', (req,res) => {
+  res.json({status: true});
+})
 mongoose
   .connect(mongoDBUrl, {
     useNewUrlParser: true,
