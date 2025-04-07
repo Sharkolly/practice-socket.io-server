@@ -14,12 +14,17 @@ const { router } = require("./Routers/index");
 const verifyToken = require("./middleware");
 const User = require("./Models/User");
 const Chat = require("./Models/Chat");
+const Room = require("./Models/Room");
 
 const app = express();
 const server = http.createServer(app); // 🔥 Create HTTP server
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5174',  "https://practice-socketio.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://practice-socketio.vercel.app",
+    ],
     credentials: true,
   },
 });
@@ -37,7 +42,11 @@ app.use("/uploads", express.static("uploads"));
 // app.use(cors());
 app.use(
   cors({
-    origin: ["http://localhost:5174", "https://practice-socketio.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://practice-socketio.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -170,25 +179,65 @@ io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 
   socket.on("join-room", async (data, cb) => {
+    console.log(data);
     try {
       const chatDetails = {
         roomId: data,
       };
-
+      const roomDetails = {
+        roomId: data,
+        userId: socket.user._id,
+      };
       socket.join(data);
       cb("You Joined" + " " + data);
       const getAllMsg = await Chat.findOne({ roomId: data });
       io.to(data).emit("sent-message", getAllMsg);
+      io.to(data).emit("notification", socket.id);
 
       const checkIf = await Chat.find({ roomId: data });
-      if (checkIf) {
-        console.log("Exists already");
-        throw new Error("Error Dey!!");
+      if (checkIf) return;
+      const checkIfRoom = await Room.find({ roomId: data });
+      if (checkIfRoom) {
+        // console.log("Exists already");
+        throw new Error("Error Dey For Room!!");
       }
 
       const addToDb = await new Chat(chatDetails);
       const saveDb = await addToDb.save();
-      console.log(saveDb);
+      const addRoomToDb = await new Room(roomDetails);
+      const saveRoomToDb = await addRoomToDb.save();
+    } catch (e) {
+      console.log(e.message);
+    }
+  });
+  socket.on("joined-room", async (data, cb) => {
+    console.log(data);
+    try {
+      const chatDetails = {
+        roomId: data,
+      };
+      const roomDetails = {
+        roomId: data,
+        userId: socket.user._id,
+      };
+      socket.join(data);
+      cb("You Joined" + " " + data);
+      const getAllMsg = await Chat.findOne({ roomId: data });
+      io.to(data).emit("sent-message", getAllMsg);
+      io.to(data).emit("notification", socket.id);
+
+      const checkIf = await Chat.find({ roomId: data });
+      if (checkIf) return;
+      const checkIfRoom = await Room.find({ roomId: data });
+      if (checkIfRoom) {
+        // console.log("Exists already");
+        throw new Error("Error Dey For Room!!");
+      }
+
+      const addToDb = await new Chat(chatDetails);
+      const saveDb = await addToDb.save();
+      const addRoomToDb = await new Room(roomDetails);
+      const saveRoomToDb = await addRoomToDb.save();
     } catch (e) {
       console.log(e.message);
     }
@@ -204,17 +253,19 @@ io.on("connection", (socket) => {
             messages: {
               senderId: socket.user._id,
               message: data,
+              senderEmail: socket.user.email,
             },
           },
         },
         { new: true, upsert: true }
       );
       const getAllMsg = await Chat.findOne({ roomId: room });
-      console.log(getAllMsg);
-      io.to(room).emit("sent-message", getAllMsg);
-      // io.to(room).emit("sent-message", { message: data, id: socket.id });
+      io.to(room).emit("sent-message", getAllMsg, {
+        message: data,
+        id: socket.id,
+        email: socket.user.email,
+      });
     } else {
-      // Send to everyone globally INCLUDING the sender
       // io.emit("sent-message",  upDate);
       io.emit("sent-message", { message: data, id: socket.id });
     }
